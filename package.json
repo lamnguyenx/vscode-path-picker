@@ -5,6 +5,10 @@
 	"version": "0.0.1",
 	"publisher": "lamnt45",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lamnguyenx/vscode-path-picker.git"
+	},
 	"icon": "media/icon.png",
 	"engines": {
 		"vscode": "^1.100.0"
@@ -33,10 +37,10 @@
 		"keybindings": [
 			{
 				"command": "pathCopier.pickPath",
-				"key": "ctrl+shift+p",
-				"mac": "cmd+shift+p",
-				"linux": "ctrl+shift+p",
-				"win": "ctrl+shift+p"
+				"key": "meta+shift+p",
+				"mac": "ctrl+shift+p",
+				"linux": "meta+shift+p",
+				"win": "meta+shift+p"
 			},
 			{
 				"command": "pathCopier.copyRealPath",

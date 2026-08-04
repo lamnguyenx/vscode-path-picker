@@ -69,8 +69,10 @@ function refresh(): void {
 
 function toItem(e: IndexEntry): EntryItem {
 	return {
-		label: (e.isDir ? '$(folder)' : '$(file)') + ' ' + e.rel.split('/').pop(),
+		label: e.rel.split('/').pop() ?? '',
 		description: currentIndex?.descriptionOf(e),
+		iconPath: e.isDir ? vscode.ThemeIcon.Folder : vscode.ThemeIcon.File,
+		resourceUri: vscode.Uri.file(e.abs),
 		alwaysShow: true,
 		entry: e,
 	};

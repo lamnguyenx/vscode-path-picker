@@ -11,10 +11,15 @@ Trigger the picker:
 
 | Shortcut | Platform |
 | --- | --- |
-| `Cmd+Shift+P` | macOS |
-| `Ctrl+Shift+P` | Windows / Linux |
+| `Ctrl+Shift+P` | macOS |
+| `Meta+Shift+P` | Windows / Linux |
 
 or via Command Palette: **Path Copier: Pick File or Folder and Copy Path**.
+
+The default keybinding for `pathCopier.pickPath` is defined in
+`package.json` → `contributes.keybindings` (along with the picker-scoped
+`shift+enter` for `pathCopier.copyRealPath`), so it can be changed/rebound from
+**Preferences → Keyboard Shortcuts** like any other command.
 
 Inside the picker:
 
