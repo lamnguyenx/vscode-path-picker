@@ -14,6 +14,7 @@
 	],
 	"activationEvents": [
 		"onCommand:pathCopier.pickPath",
+		"onCommand:pathCopier.pickPathRogue",
 		"onCommand:pathCopier.copyRealPath"
 	],
 	"main": "./out/extension.js",
@@ -25,6 +26,11 @@
 				"category": "Path Copier"
 			},
 			{
+				"command": "pathCopier.pickPathRogue",
+				"title": "Pick File or Folder and Copy Path (Rogue Mode)",
+				"category": "Path Copier"
+			},
+			{
 				"command": "pathCopier.copyRealPath",
 				"title": "Copy Real Path",
 				"category": "Path Copier"
@@ -33,10 +39,17 @@
 		"keybindings": [
 			{
 				"command": "pathCopier.pickPath",
-				"key": "cmd+shift+a",
-				"mac": "cmd+shift+a",
-				"linux": "ctrl+shift+a",
-				"win": "ctrl+shift+a"
+				"key": "ctrl+shift+p",
+				"mac": "cmd+shift+p",
+				"linux": "ctrl+shift+p",
+				"win": "ctrl+shift+p"
+			},
+			{
+				"command": "pathCopier.pickPathRogue",
+				"key": "ctrl+cmd+shift+p",
+				"mac": "ctrl+cmd+shift+p",
+				"linux": "ctrl+alt+shift+p",
+				"win": "ctrl+alt+shift+p"
 			},
 			{
 				"command": "pathCopier.copyRealPath",
@@ -72,6 +85,16 @@
 					"type": "number",
 					"default": 30000,
 					"description": "Maximum number of files and folders to index."
+				},
+				"pathCopier.followSymlinks": {
+					"type": "boolean",
+					"default": false,
+					"description": "Whether to follow symbolic links while indexing files and folders. Symlink cycles are detected and skipped."
+				},
+				"pathCopier.rogueFollowSymlinks": {
+					"type": "boolean",
+					"default": false,
+					"description": "Whether rogue mode (ignores .gitignore) follows symbolic links while indexing. Symlink cycles are detected and skipped."
 				}
 			}
 		}
@@ -87,5 +110,8 @@
 		"@types/vscode": "^1.100.0",
 		"@vscode/vsce": "^3.9.2",
 		"typescript": "^5.5.0"
+	},
+	"dependencies": {
+		"ignore": "^7.0.6"
 	}
 }

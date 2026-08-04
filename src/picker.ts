@@ -10,6 +10,8 @@ interface EntryItem extends vscode.QuickPickItem {
 }
 
 let index: PathIndex | undefined;
+let rogueIndex: PathIndex | undefined;
+let currentIndex: PathIndex | undefined;
 let current: vscode.QuickPick<EntryItem> | undefined;
 let isVisible = false;
 
@@ -17,14 +19,20 @@ export function attachIndex(value: PathIndex): void {
 	index = value;
 }
 
-export async function showPicker(): Promise<void> {
-	if (!index) {
+export function attachRogueIndex(value: PathIndex): void {
+	rogueIndex = value;
+}
+
+export async function showPicker(rogue: boolean): Promise<void> {
+	const src = rogue ? rogueIndex : index;
+	if (!src) {
 		return;
 	}
-	if (index.isEmpty) {
+	if (src.isEmpty) {
 		void vscode.window.showInformationMessage('Path Copier: open a folder to pick files or folders.');
 		return;
 	}
+	currentIndex = src;
 	if (!current) {
 		current = vscode.window.createQuickPick<EntryItem>();
 		current.canSelectMany = false;
@@ -32,7 +40,6 @@ export async function showPicker(): Promise<void> {
 		current.matchOnDetail = false;
 		current.ignoreFocusOut = true;
 		current.title = 'Path Copier';
-		current.placeholder = 'Search files and folders  —  Enter: copy relative path, Shift+Enter: copy real path';
 		current.onDidChangeValue(() => refresh());
 		current.onDidAccept(() => doAccept(false));
 		current.onDidHide(() => {
@@ -40,7 +47,10 @@ export async function showPicker(): Promise<void> {
 			void vscode.commands.executeCommand('setContext', 'pathCopierPickerVisible', false);
 		});
 	}
-	await index.build();
+	current.placeholder = rogue
+		? 'Rogue — ⏎ relative · ⇧⏎ real'
+		: 'Search — ⏎ relative · ⇧⏎ real';
+	await src.build();
 	current.value = '';
 	current.activeItems = [];
 	current.selectedItems = [];
@@ -57,17 +67,17 @@ export function refreshPicker(): void {
 }
 
 function refresh(): void {
-	if (!current || !index) {
+	if (!current || !currentIndex) {
 		return;
 	}
 	const query = current.value;
-	current.items = index.entriesFor(query, hasGlobChars(query)).map(toItem);
+	current.items = currentIndex.entriesFor(query, hasGlobChars(query)).map(toItem);
 }
 
 function toItem(e: IndexEntry): EntryItem {
 	return {
 		label: (e.isDir ? '$(folder)' : '$(file)') + ' ' + e.rel.split('/').pop(),
-		description: index?.descriptionOf(e),
+		description: currentIndex?.descriptionOf(e),
 		alwaysShow: true,
 		entry: e,
 	};
@@ -96,28 +106,28 @@ export async function copyRealPath(): Promise<void> {
 }
 
 async function copyEntry(e: IndexEntry, copyReal: boolean): Promise<void> {
-	if (!index) {
+	if (!currentIndex) {
 		return;
 	}
 	const text = copyReal
 		? await realPath(e.abs)
-		: relativeToRoot(e.abs, rootOf(e.abs, index.roots) ?? e.abs);
+		: relativeToRoot(e.abs, rootOf(e.abs, currentIndex.roots) ?? e.abs);
 	await copy(text, copyReal);
 }
 
 async function tryResolveRawQuery(query: string, copyReal: boolean): Promise<boolean> {
-	if (!index) {
+	if (!currentIndex) {
 		return false;
 	}
 	const isAbsolute = query.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(query);
-	for (const root of index.roots) {
+	for (const root of currentIndex.roots) {
 		const abs = isAbsolute ? query : path.resolve(root, query);
 		try {
 			const stat = await fs.promises.stat(abs);
 			if (stat.isFile() || stat.isDirectory()) {
 				const text = copyReal
 					? await realPath(abs)
-					: relativeToRoot(abs, rootOf(abs, index.roots) ?? root);
+					: relativeToRoot(abs, rootOf(abs, currentIndex.roots) ?? root);
 				await copy(text, copyReal);
 				return true;
 			}

@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { fuzzyScore, globMatch } from './fuzzy';
+import { isIgnored, loadGitignore, IgnoreLayer } from './gitignore';
 import { relativeToRoot, toPosix } from './paths';
 
 export interface IndexEntry {
@@ -14,6 +15,8 @@ export interface IndexEntry {
 export interface IndexConfig {
 	exclude: string[];
 	maxEntries: number;
+	followSymlinks: boolean;
+	ignoreGitignore: boolean;
 }
 
 export class PathIndex {
@@ -43,6 +46,16 @@ export class PathIndex {
 				break;
 			}
 			const root = folder.uri.fsPath;
+			const seenFiles = new Set<string>();
+			if (cfg.ignoreGitignore) {
+				await this.walk(root, root, all, cfg, [], new Set(), seenFiles);
+				continue;
+			}
+			const layers: IgnoreLayer[] = [];
+			const rootIgnore = await loadGitignore(root);
+			if (rootIgnore) {
+				layers.push(rootIgnore);
+			}
 			try {
 				const files = await vscode.workspace.findFiles(
 					new vscode.RelativePattern(folder, '**/*'),
@@ -53,12 +66,16 @@ export class PathIndex {
 					if (all.length >= cfg.maxEntries) {
 						break;
 					}
+					if (isIgnored(uri.fsPath, layers)) {
+						continue;
+					}
+					seenFiles.add(uri.fsPath);
 					all.push(this.makeEntry(uri.fsPath, root, false));
 				}
 			} catch {
 				// ignore unreadable roots
 			}
-			await this.walk(root, root, all, cfg);
+			await this.walk(root, root, all, cfg, layers, new Set(), seenFiles);
 		}
 
 		if (token !== this.buildToken) {
@@ -72,7 +89,15 @@ export class PathIndex {
 		return { abs, rel, lowerRel: rel.toLowerCase(), isDir };
 	}
 
-	private async walk(dir: string, root: string, all: IndexEntry[], cfg: IndexConfig): Promise<void> {
+	private async walk(
+		dir: string,
+		root: string,
+		all: IndexEntry[],
+		cfg: IndexConfig,
+		layers: IgnoreLayer[],
+		visitedDirs: Set<string>,
+		seenFiles: Set<string>
+	): Promise<void> {
 		if (all.length >= cfg.maxEntries) {
 			return;
 		}
@@ -83,19 +108,72 @@ export class PathIndex {
 			return;
 		}
 		children.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+		let childLayers = layers;
+		if (!cfg.ignoreGitignore && children.some(c => c.name === '.gitignore' && !c.isDirectory())) {
+			const ignoreLayer = await loadGitignore(dir);
+			if (ignoreLayer) {
+				childLayers = [...layers, ignoreLayer];
+			}
+		}
 		for (const child of children) {
 			if (all.length >= cfg.maxEntries) {
 				return;
+			}
+			if (child.name === '.gitignore') {
+				continue;
+			}
+			const abs = path.join(dir, child.name);
+			if (child.isSymbolicLink()) {
+				if (!cfg.followSymlinks) {
+					continue;
+				}
+				let target: fs.Stats;
+				try {
+					target = await fs.promises.stat(abs);
+				} catch {
+					continue;
+				}
+				if (!cfg.ignoreGitignore && isIgnored(abs, childLayers, target.isDirectory())) {
+					continue;
+				}
+				if (target.isDirectory()) {
+					if (cfg.exclude.includes(child.name)) {
+						continue;
+					}
+					let real = abs;
+					try {
+						real = await fs.promises.realpath(abs);
+					} catch {
+						// keep the link path
+					}
+					if (visitedDirs.has(real)) {
+						continue;
+					}
+					visitedDirs.add(real);
+					all.push(this.makeEntry(abs, root, true));
+					await this.walk(abs, root, all, cfg, childLayers, visitedDirs, seenFiles);
+				} else if (target.isFile()) {
+					if (!seenFiles.has(abs)) {
+						seenFiles.add(abs);
+						all.push(this.makeEntry(abs, root, false));
+					}
+				}
+				continue;
+			}
+			if (!cfg.ignoreGitignore && isIgnored(abs, childLayers, child.isDirectory())) {
+				continue;
 			}
 			if (child.isDirectory()) {
 				if (cfg.exclude.includes(child.name)) {
 					continue;
 				}
-				const abs = path.join(dir, child.name);
 				all.push(this.makeEntry(abs, root, true));
-				await this.walk(abs, root, all, cfg);
+				await this.walk(abs, root, all, cfg, childLayers, visitedDirs, seenFiles);
 			} else if (child.isFile()) {
-				all.push(this.makeEntry(path.join(dir, child.name), root, false));
+				if (cfg.ignoreGitignore && !seenFiles.has(abs)) {
+					seenFiles.add(abs);
+					all.push(this.makeEntry(abs, root, false));
+				}
 			}
 		}
 	}
