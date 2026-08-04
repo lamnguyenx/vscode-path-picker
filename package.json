@@ -1,0 +1,91 @@
+{
+	"name": "vscode-path-picker",
+	"displayName": "Path Copier",
+	"description": "Pick a file or folder like the File Picker, then copy its relative path (Enter) or real path (Shift+Enter).",
+	"version": "0.0.1",
+	"publisher": "lamnt45",
+	"license": "MIT",
+	"icon": "media/icon.png",
+	"engines": {
+		"vscode": "^1.100.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:pathCopier.pickPath",
+		"onCommand:pathCopier.copyRealPath"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "pathCopier.pickPath",
+				"title": "Pick File or Folder and Copy Path",
+				"category": "Path Copier"
+			},
+			{
+				"command": "pathCopier.copyRealPath",
+				"title": "Copy Real Path",
+				"category": "Path Copier"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "pathCopier.pickPath",
+				"key": "cmd+shift+a",
+				"mac": "cmd+shift+a",
+				"linux": "ctrl+shift+a",
+				"win": "ctrl+shift+a"
+			},
+			{
+				"command": "pathCopier.copyRealPath",
+				"key": "shift+enter",
+				"when": "pathCopierPickerVisible"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "pathCopier.copyRealPath",
+					"when": "false"
+				}
+			]
+		},
+		"configuration": {
+			"title": "Path Copier",
+			"properties": {
+				"pathCopier.exclude": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [
+						"node_modules",
+						".git",
+						".hg",
+						".svn"
+					],
+					"description": "Directory names that are skipped while indexing folders."
+				},
+				"pathCopier.maxEntries": {
+					"type": "number",
+					"default": 30000,
+					"description": "Maximum number of files and folders to index."
+				}
+			}
+		}
+	},
+	"scripts": {
+		"compile": "tsc -p ./",
+		"watch": "tsc -w -p ./",
+		"vscode:prepublish": "npm run compile",
+		"package": "vsce package"
+	},
+	"devDependencies": {
+		"@types/node": "^26.0.0",
+		"@types/vscode": "^1.100.0",
+		"@vscode/vsce": "^3.9.2",
+		"typescript": "^5.5.0"
+	}
+}
