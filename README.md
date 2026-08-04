@@ -16,19 +16,6 @@ Trigger the picker:
 
 or via Command Palette: **Path Copier: Pick File or Folder and Copy Path**.
 
-### Rogue mode
-
-Rogue mode is the same picker but it **ignores `.gitignore`** — everything on
-disk is listed, including gitignored files and directories.
-
-| Shortcut | Platform |
-| --- | --- |
-| `Ctrl+Cmd+Shift+P` | macOS |
-| `Ctrl+Alt+Shift+P` | Windows / Linux |
-
-or via Command Palette: **Path Copier: Pick File or Folder and Copy Path
-(Rogue Mode)**.
-
 Inside the picker:
 
 - Type to fuzzy-search files and folders (subsequence match, e.g. `cmp` → `src/components.ts`).
@@ -47,7 +34,6 @@ The `Shift+Enter` keybinding is scoped to the open picker (context key
 | `pathCopier.exclude` | `["node_modules", ".git", ".hg", ".svn"]` | Directory names skipped while indexing folders. |
 | `pathCopier.maxEntries` | `30000` | Maximum number of files + folders to index. |
 | `pathCopier.followSymlinks` | `false` | Follow symbolic links while indexing. Symlink cycles are detected and skipped. |
-| `pathCopier.rogueFollowSymlinks` | `false` | Whether rogue mode (ignores `.gitignore`) follows symbolic links. Symlink cycles are detected and skipped. |
 
 Files are discovered via `findFiles` (respects `files.exclude` /
 `search.exclude`); folder traversal honors `pathCopier.exclude`. Both honor
@@ -56,11 +42,6 @@ don't show up in the picker. Symbolic links are not followed by default;
 set `pathCopier.followSymlinks` to `true` to index symlinked files and
 folders (symlink cycles are skipped). The index rebuilds automatically when
 the workspace changes.
-
-Rogue mode instead does a raw filesystem walk: it ignores `.gitignore`
-**and** `files.exclude`/`search.exclude` (only `pathCopier.exclude` and
-`pathCopier.maxEntries` still apply), and follows symlinks according to
-`pathCopier.rogueFollowSymlinks`.
 
 ## Development
 

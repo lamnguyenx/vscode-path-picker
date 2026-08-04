@@ -16,7 +16,6 @@ export interface IndexConfig {
 	exclude: string[];
 	maxEntries: number;
 	followSymlinks: boolean;
-	ignoreGitignore: boolean;
 }
 
 export class PathIndex {
@@ -47,10 +46,6 @@ export class PathIndex {
 			}
 			const root = folder.uri.fsPath;
 			const seenFiles = new Set<string>();
-			if (cfg.ignoreGitignore) {
-				await this.walk(root, root, all, cfg, [], new Set(), seenFiles);
-				continue;
-			}
 			const layers: IgnoreLayer[] = [];
 			const rootIgnore = await loadGitignore(root);
 			if (rootIgnore) {
@@ -109,7 +104,7 @@ export class PathIndex {
 		}
 		children.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 		let childLayers = layers;
-		if (!cfg.ignoreGitignore && children.some(c => c.name === '.gitignore' && !c.isDirectory())) {
+		if (children.some(c => c.name === '.gitignore' && !c.isDirectory())) {
 			const ignoreLayer = await loadGitignore(dir);
 			if (ignoreLayer) {
 				childLayers = [...layers, ignoreLayer];
@@ -133,7 +128,7 @@ export class PathIndex {
 				} catch {
 					continue;
 				}
-				if (!cfg.ignoreGitignore && isIgnored(abs, childLayers, target.isDirectory())) {
+				if (isIgnored(abs, childLayers, target.isDirectory())) {
 					continue;
 				}
 				if (target.isDirectory()) {
@@ -160,7 +155,7 @@ export class PathIndex {
 				}
 				continue;
 			}
-			if (!cfg.ignoreGitignore && isIgnored(abs, childLayers, child.isDirectory())) {
+			if (isIgnored(abs, childLayers, child.isDirectory())) {
 				continue;
 			}
 			if (child.isDirectory()) {
@@ -170,10 +165,7 @@ export class PathIndex {
 				all.push(this.makeEntry(abs, root, true));
 				await this.walk(abs, root, all, cfg, childLayers, visitedDirs, seenFiles);
 			} else if (child.isFile()) {
-				if (cfg.ignoreGitignore && !seenFiles.has(abs)) {
-					seenFiles.add(abs);
-					all.push(this.makeEntry(abs, root, false));
-				}
+				// files are indexed via findFiles; only symlinked files are added here
 			}
 		}
 	}

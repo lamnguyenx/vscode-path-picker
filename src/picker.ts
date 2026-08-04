@@ -10,7 +10,6 @@ interface EntryItem extends vscode.QuickPickItem {
 }
 
 let index: PathIndex | undefined;
-let rogueIndex: PathIndex | undefined;
 let currentIndex: PathIndex | undefined;
 let current: vscode.QuickPick<EntryItem> | undefined;
 let isVisible = false;
@@ -19,12 +18,8 @@ export function attachIndex(value: PathIndex): void {
 	index = value;
 }
 
-export function attachRogueIndex(value: PathIndex): void {
-	rogueIndex = value;
-}
-
-export async function showPicker(rogue: boolean): Promise<void> {
-	const src = rogue ? rogueIndex : index;
+export async function showPicker(): Promise<void> {
+	const src = index;
 	if (!src) {
 		return;
 	}
@@ -47,9 +42,7 @@ export async function showPicker(rogue: boolean): Promise<void> {
 			void vscode.commands.executeCommand('setContext', 'pathCopierPickerVisible', false);
 		});
 	}
-	current.placeholder = rogue
-		? 'Rogue — ⏎ relative · ⇧⏎ real'
-		: 'Search — ⏎ relative · ⇧⏎ real';
+	current.placeholder = 'Search — ⏎ relative · ⇧⏎ real';
 	await src.build();
 	current.value = '';
 	current.activeItems = [];
