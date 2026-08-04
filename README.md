@@ -1,4 +1,4 @@
-# Path Copier
+# Path Picker
 
 Pick a file **or folder** from the workspace — like VS Code's File Picker (Ctrl/Cmd+P) — and copy its path.
 
@@ -14,11 +14,11 @@ Trigger the picker:
 | `Ctrl+Shift+P` | macOS |
 | `Meta+Shift+P` | Windows / Linux |
 
-or via Command Palette: **Path Copier: Pick File or Folder and Copy Path**.
+or via Command Palette: **Path Picker: Pick File or Folder and Copy Path**.
 
-The default keybinding for `pathCopier.pickPath` is defined in
+The default keybinding for `pathPicker.pickPath` is defined in
 `package.json` → `contributes.keybindings` (along with the picker-scoped
-`shift+enter` for `pathCopier.copyRealPath`), so it can be changed/rebound from
+`shift+enter` for `pathPicker.copyRealPath`), so it can be changed/rebound from
 **Preferences → Keyboard Shortcuts** like any other command.
 
 Inside the picker:
@@ -30,21 +30,21 @@ Inside the picker:
 - The copied path is written to the clipboard and confirmed in the status bar.
 
 The `Shift+Enter` keybinding is scoped to the open picker (context key
-`pathCopierPickerVisible`), so it never interferes outside it.
+`pathPickerPickerVisible`), so it never interferes outside it.
 
 ## Settings
 
 | Setting | Default | Description |
 | --- | --- | --- |
-| `pathCopier.exclude` | `["node_modules", ".git", ".hg", ".svn"]` | Directory names skipped while indexing folders. |
-| `pathCopier.maxEntries` | `30000` | Maximum number of files + folders to index. |
-| `pathCopier.followSymlinks` | `false` | Follow symbolic links while indexing. Symlink cycles are detected and skipped. |
+| `pathPicker.exclude` | `["node_modules", ".git", ".hg", ".svn"]` | Directory names skipped while indexing folders. |
+| `pathPicker.maxEntries` | `30000` | Maximum number of files + folders to index. |
+| `pathPicker.followSymlinks` | `false` | Follow symbolic links while indexing. Symlink cycles are detected and skipped. |
 
 Files are discovered via `findFiles` (respects `files.exclude` /
-`search.exclude`); folder traversal honors `pathCopier.exclude`. Both honor
+`search.exclude`); folder traversal honors `pathPicker.exclude`. Both honor
 `.gitignore` files, including nested ones, so ignored files and directories
 don't show up in the picker. Symbolic links are not followed by default;
-set `pathCopier.followSymlinks` to `true` to index symlinked files and
+set `pathPicker.followSymlinks` to `true` to index symlinked files and
 folders (symlink cycles are skipped). The index rebuilds automatically when
 the workspace changes.
 

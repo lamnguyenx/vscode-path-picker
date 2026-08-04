@@ -1,6 +1,6 @@
 {
 	"name": "vscode-path-picker",
-	"displayName": "Path Copier",
+	"displayName": "Path Picker",
 	"description": "Pick a file or folder like the File Picker, then copy its relative path (Enter) or real path (Shift+Enter).",
 	"version": "0.0.1",
 	"publisher": "lamnt45",
@@ -17,49 +17,49 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:pathCopier.pickPath",
-		"onCommand:pathCopier.copyRealPath"
+		"onCommand:pathPicker.pickPath",
+		"onCommand:pathPicker.copyRealPath"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "pathCopier.pickPath",
+				"command": "pathPicker.pickPath",
 				"title": "Pick File or Folder and Copy Path",
-				"category": "Path Copier"
+				"category": "Path Picker"
 			},
 			{
-				"command": "pathCopier.copyRealPath",
+				"command": "pathPicker.copyRealPath",
 				"title": "Copy Real Path",
-				"category": "Path Copier"
+				"category": "Path Picker"
 			}
 		],
 		"keybindings": [
 			{
-				"command": "pathCopier.pickPath",
-				"key": "meta+shift+p",
-				"mac": "ctrl+shift+p",
-				"linux": "meta+shift+p",
-				"win": "meta+shift+p"
+				"command": "pathPicker.pickPath",
+				"key": "meta+alt+shift+p",
+				"mac": "ctrl+alt+shift+p",
+				"linux": "meta+alt+shift+p",
+				"win": "meta+alt+shift+p"
 			},
 			{
-				"command": "pathCopier.copyRealPath",
+				"command": "pathPicker.copyRealPath",
 				"key": "shift+enter",
-				"when": "pathCopierPickerVisible"
+				"when": "pathPickerPickerVisible"
 			}
 		],
 		"menus": {
 			"commandPalette": [
 				{
-					"command": "pathCopier.copyRealPath",
+					"command": "pathPicker.copyRealPath",
 					"when": "false"
 				}
 			]
 		},
 		"configuration": {
-			"title": "Path Copier",
+			"title": "Path Picker",
 			"properties": {
-				"pathCopier.exclude": {
+				"pathPicker.exclude": {
 					"type": "array",
 					"items": {
 						"type": "string"
@@ -72,12 +72,12 @@
 					],
 					"description": "Directory names that are skipped while indexing folders."
 				},
-				"pathCopier.maxEntries": {
+				"pathPicker.maxEntries": {
 					"type": "number",
 					"default": 30000,
 					"description": "Maximum number of files and folders to index."
 				},
-				"pathCopier.followSymlinks": {
+				"pathPicker.followSymlinks": {
 					"type": "boolean",
 					"default": false,
 					"description": "Whether to follow symbolic links while indexing files and folders. Symlink cycles are detected and skipped."

@@ -24,7 +24,7 @@ export async function showPicker(): Promise<void> {
 		return;
 	}
 	if (src.isEmpty) {
-		void vscode.window.showInformationMessage('Path Copier: open a folder to pick files or folders.');
+		void vscode.window.showInformationMessage('Path Picker: open a folder to pick files or folders.');
 		return;
 	}
 	currentIndex = src;
@@ -34,12 +34,12 @@ export async function showPicker(): Promise<void> {
 		current.matchOnDescription = false;
 		current.matchOnDetail = false;
 		current.ignoreFocusOut = true;
-		current.title = 'Path Copier';
+		current.title = 'Path Picker';
 		current.onDidChangeValue(() => refresh());
 		current.onDidAccept(() => doAccept(false));
 		current.onDidHide(() => {
 			isVisible = false;
-			void vscode.commands.executeCommand('setContext', 'pathCopierPickerVisible', false);
+			void vscode.commands.executeCommand('setContext', 'pathPickerPickerVisible', false);
 		});
 	}
 	current.placeholder = 'Search — ⏎ relative · ⇧⏎ real';
@@ -47,7 +47,7 @@ export async function showPicker(): Promise<void> {
 	current.value = '';
 	current.activeItems = [];
 	current.selectedItems = [];
-	await vscode.commands.executeCommand('setContext', 'pathCopierPickerVisible', true);
+	await vscode.commands.executeCommand('setContext', 'pathPickerPickerVisible', true);
 	isVisible = true;
 	refresh();
 	current.show();

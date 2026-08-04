@@ -1,4 +1,4 @@
-# How to Test Path Copier
+# How to Test Path Picker
 
 This extension was validated end-to-end against a **real, running VS Code instance** (not unit mocks). The extension runs in an isolated profile with a fresh `user-data-dir` and its own `extensions-dir`, and is driven over the Chrome DevTools Protocol (CDP) with Playwright. Clipboard results are verified on the OS level with `pbpaste`.
 
@@ -128,7 +128,7 @@ Expected results:
 | --- | --- |
 | absolute path + Shift+Enter | real path copied |
 | query matching nothing + Enter | picker stays open, nothing copied |
-| Shift+Enter with picker closed | nothing happens (keybinding is scoped by `pathCopierPickerVisible`) |
+| Shift+Enter with picker closed | nothing happens (keybinding is scoped by `pathPickerPickerVisible`) |
 | directory + Shift+Enter | absolute directory path copied |
 
 ## 4. What to watch for (bugs found this way)

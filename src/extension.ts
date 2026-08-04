@@ -3,7 +3,7 @@ import { IndexConfig, PathIndex } from './index';
 import { attachIndex, copyRealPath, refreshPicker, showPicker } from './picker';
 
 function getConfig(): IndexConfig {
-	const cfg = vscode.workspace.getConfiguration('pathCopier');
+	const cfg = vscode.workspace.getConfiguration('pathPicker');
 	return {
 		exclude: cfg.get<string[]>('exclude', ['node_modules', '.git', '.hg', '.svn']),
 		maxEntries: cfg.get<number>('maxEntries', 30000),
@@ -16,8 +16,8 @@ export function activate(context: vscode.ExtensionContext): void {
 	attachIndex(index);
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('pathCopier.pickPath', () => showPicker()),
-		vscode.commands.registerCommand('pathCopier.copyRealPath', copyRealPath),
+		vscode.commands.registerCommand('pathPicker.pickPath', () => showPicker()),
+		vscode.commands.registerCommand('pathPicker.copyRealPath', copyRealPath),
 		vscode.workspace.onDidChangeWorkspaceFolders(() => {
 			void index.build().then(refreshPicker);
 		})
