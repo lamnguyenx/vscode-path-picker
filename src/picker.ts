@@ -42,7 +42,8 @@ export async function showPicker(): Promise<void> {
 			void vscode.commands.executeCommand('setContext', 'pathPickerPickerVisible', false);
 		});
 	}
-	current.placeholder = 'Search — ⏎ relative · ⇧⏎ real';
+	current.placeholder = 'Search';
+	current.prompt = '⏎ relative · ⇧⏎ real · ⌘⏎ reveal';
 	await src.build();
 	current.value = '';
 	current.activeItems = [];
@@ -67,10 +68,28 @@ function refresh(): void {
 	current.items = currentIndex.entriesFor(query, hasGlobChars(query)).map(toItem);
 }
 
+const MAX_LABEL_LENGTH = 80;
+
+function truncateLeft(rel: string): string {
+	if (rel.length <= MAX_LABEL_LENGTH) {
+		return rel;
+	}
+	let out = rel;
+	while (out.length > MAX_LABEL_LENGTH) {
+		const slash = out.indexOf('/');
+		if (slash === -1) {
+			return '…' + out.slice(out.length - (MAX_LABEL_LENGTH - 1));
+		}
+		out = out.slice(slash + 1);
+	}
+	return '…/' + out;
+}
+
 function toItem(e: IndexEntry): EntryItem {
+	const rel = e.isDir ? e.rel + '/' : e.rel;
 	return {
-		label: e.rel.split('/').pop() ?? '',
-		description: currentIndex?.descriptionOf(e),
+		label: truncateLeft(rel),
+		description: '',
 		iconPath: e.isDir ? vscode.ThemeIcon.Folder : vscode.ThemeIcon.File,
 		resourceUri: vscode.Uri.file(e.abs),
 		alwaysShow: true,
@@ -110,9 +129,26 @@ async function copyEntry(e: IndexEntry, copyReal: boolean): Promise<void> {
 	await copy(text, copyReal);
 }
 
-async function tryResolveRawQuery(query: string, copyReal: boolean): Promise<boolean> {
+export async function revealInExplorer(): Promise<void> {
+	if (!current || !isVisible) {
+		return;
+	}
+	const picked = (current.activeItems[0] ?? current.selectedItems[0]) as EntryItem | undefined;
+	if (picked) {
+		await vscode.commands.executeCommand('revealInExplorer', vscode.Uri.file(picked.entry.abs));
+		current.hide();
+		return;
+	}
+	const found = await resolveRawPath(current.value);
+	if (found) {
+		await vscode.commands.executeCommand('revealInExplorer', vscode.Uri.file(found.abs));
+		current.hide();
+	}
+}
+
+async function resolveRawPath(query: string): Promise<{ abs: string; root: string } | undefined> {
 	if (!currentIndex) {
-		return false;
+		return undefined;
 	}
 	const isAbsolute = query.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(query);
 	for (const root of currentIndex.roots) {
@@ -120,17 +156,29 @@ async function tryResolveRawQuery(query: string, copyReal: boolean): Promise<boo
 		try {
 			const stat = await fs.promises.stat(abs);
 			if (stat.isFile() || stat.isDirectory()) {
-				const text = copyReal
-					? await realPath(abs)
-					: relativeToRoot(abs, rootOf(abs, currentIndex.roots) ?? root);
-				await copy(text, copyReal);
-				return true;
+				return { abs, root };
 			}
 		} catch {
 			// keep trying next root
 		}
 	}
-	return false;
+	return undefined;
+}
+
+async function tryResolveRawQuery(query: string, copyReal: boolean): Promise<boolean> {
+	const idx = currentIndex;
+	if (!idx) {
+		return false;
+	}
+	const found = await resolveRawPath(query);
+	if (!found) {
+		return false;
+	}
+	const text = copyReal
+		? await realPath(found.abs)
+		: relativeToRoot(found.abs, rootOf(found.abs, idx.roots) ?? found.root);
+	await copy(text, copyReal);
+	return true;
 }
 
 async function copy(text: string, copyReal: boolean): Promise<void> {

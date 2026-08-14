@@ -1,7 +1,7 @@
 {
 	"name": "vscode-path-picker",
 	"displayName": "Path Picker",
-	"description": "Pick a file or folder like the File Picker, then copy its relative path (Enter) or real path (Shift+Enter).",
+	"description": "Pick a file or folder like the File Picker, then copy its relative path (Enter), real path (Shift+Enter), or reveal it in the Explorer (Cmd+Enter).",
 	"version": "0.0.1",
 	"publisher": "lamnt45",
 	"license": "MIT",
@@ -18,7 +18,8 @@
 	],
 	"activationEvents": [
 		"onCommand:pathPicker.pickPath",
-		"onCommand:pathPicker.copyRealPath"
+		"onCommand:pathPicker.copyRealPath",
+		"onCommand:pathPicker.revealInExplorer"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -31,6 +32,11 @@
 			{
 				"command": "pathPicker.copyRealPath",
 				"title": "Copy Real Path",
+				"category": "Path Picker"
+			},
+			{
+				"command": "pathPicker.revealInExplorer",
+				"title": "Reveal in Explorer",
 				"category": "Path Picker"
 			}
 		],
@@ -46,12 +52,24 @@
 				"command": "pathPicker.copyRealPath",
 				"key": "shift+enter",
 				"when": "pathPickerPickerVisible"
+			},
+			{
+				"command": "pathPicker.revealInExplorer",
+				"key": "meta+enter",
+				"mac": "meta+enter",
+				"win": "ctrl+enter",
+				"linux": "ctrl+enter",
+				"when": "pathPickerPickerVisible"
 			}
 		],
 		"menus": {
 			"commandPalette": [
 				{
 					"command": "pathPicker.copyRealPath",
+					"when": "false"
+				},
+				{
+					"command": "pathPicker.revealInExplorer",
 					"when": "false"
 				}
 			]

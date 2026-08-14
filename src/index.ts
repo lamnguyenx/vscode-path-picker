@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { fuzzyScore, globMatch } from './fuzzy';
 import { isIgnored, loadGitignore, IgnoreLayer } from './gitignore';
-import { relativeToRoot, toPosix } from './paths';
+import { relativeToRoot } from './paths';
 
 export interface IndexEntry {
 	abs: string;
@@ -218,10 +218,5 @@ export class PathIndex {
 		}
 		out.sort((a, b) => Number(b.isDir) - Number(a.isDir) || a.rel.localeCompare(b.rel));
 		return out;
-	}
-
-	descriptionOf(e: IndexEntry): string {
-		const idx = e.rel.lastIndexOf('/');
-		return idx > 0 ? toPosix(e.rel.slice(0, idx)) : '';
 	}
 }

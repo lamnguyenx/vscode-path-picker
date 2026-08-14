@@ -11,7 +11,7 @@ build:
 	@echo "Built $(VSIX)"
 
 install: build
-	code --install-extension $(VSIX) --force
+	npx vscode-hacker-meta install $(VSIX)
 
 clean:
 	rm -f $(VSIX)

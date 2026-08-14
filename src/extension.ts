@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { IndexConfig, PathIndex } from './index';
-import { attachIndex, copyRealPath, refreshPicker, showPicker } from './picker';
+import { attachIndex, copyRealPath, refreshPicker, revealInExplorer, showPicker } from './picker';
 
 function getConfig(): IndexConfig {
 	const cfg = vscode.workspace.getConfiguration('pathPicker');
@@ -18,6 +18,7 @@ export function activate(context: vscode.ExtensionContext): void {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('pathPicker.pickPath', () => showPicker()),
 		vscode.commands.registerCommand('pathPicker.copyRealPath', copyRealPath),
+		vscode.commands.registerCommand('pathPicker.revealInExplorer', revealInExplorer),
 		vscode.workspace.onDidChangeWorkspaceFolders(() => {
 			void index.build().then(refreshPicker);
 		})

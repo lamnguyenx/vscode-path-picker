@@ -55,7 +55,8 @@ cd exp && npm i -D playwright-core   # no browser download needed; attaches via 
 
 The core suite (`full.js`) exercises: opening via keybinding, path queries,
 relative copy on Enter, value reset on reopen, real-path copy on Shift+Enter,
-directory picking, absolute-path queries, and glob queries.
+reveal in Explorer on Cmd+Enter, directory picking, absolute-path queries,
+and glob queries.
 
 ```js
 const { chromium } = require('playwright-core');
@@ -80,12 +81,12 @@ async function main() {
   await press('Meta+Shift+A');
   await page.waitForTimeout(1000);
   console.log('root rows:', JSON.stringify(await rows()));
-  // -> assets, build, docs, src, .gitignore, main.ts
+  // -> assets/, build/, docs/, src/, .gitignore, main.ts
 
   // path query + Enter -> relative path
   await page.keyboard.type('src/deep/nested.ts', { delay: 40 });
   await page.waitForTimeout(700);
-  console.log('query rows:', JSON.stringify(await rows()));       // nested.ts
+  console.log('query rows:', JSON.stringify(await rows()));       // src/deep/nested.ts
   await press('Enter');
   console.log('clipboard:', JSON.stringify(pbpaste()));           // src/deep/nested.ts
 
@@ -107,6 +108,18 @@ async function main() {
   await press('Enter');
   console.log('clipboard:', JSON.stringify(pbpaste()));           // docs
 
+  // Cmd+Enter (mac) / Ctrl+Enter (win, linux) -> reveal in Explorer
+  await press('Meta+Shift+A');
+  await page.waitForTimeout(1000);
+  await page.keyboard.type('nested', { delay: 60 });
+  await page.waitForTimeout(700);
+  await page.keyboard.press('Meta+Enter');
+  await page.waitForTimeout(700);
+  const revealed = await page.evaluate(() =>
+    document.querySelector('.explorer-viewlet .monaco-list-row.selected')
+      ?.getAttribute('aria-label') || '');
+  console.log('revealed:', JSON.stringify(revealed));             // nested.ts
+
   await browser.close();
 }
 
@@ -115,11 +128,12 @@ main().catch(e => { console.error(e); process.exit(1); });
 
 Expected results:
 
-| Action | Clipboard |
+| Action | Clipboard / result |
 | --- | --- |
 | `Meta+Shift+A`, type `src/deep/nested.ts`, Enter | `src/deep/nested.ts` |
 | `Meta+Shift+A`, type `button`, Shift+Enter | absolute path ending `.../src/components/Button.tsx` |
 | `Meta+Shift+A`, type `docs`, Enter | `docs` |
+| `Meta+Shift+A`, type `nested`, `Meta+Enter` | file selected/revealed in Explorer view |
 | reopen picker | input resets to empty, root children shown |
 
 ### Edge cases (`edges.js`)
@@ -129,6 +143,7 @@ Expected results:
 | absolute path + Shift+Enter | real path copied |
 | query matching nothing + Enter | picker stays open, nothing copied |
 | Shift+Enter with picker closed | nothing happens (keybinding is scoped by `pathPickerPickerVisible`) |
+| Cmd+Enter with picker closed | nothing happens (scoped by `pathPickerPickerVisible`) |
 | directory + Shift+Enter | absolute directory path copied |
 
 ## 4. What to watch for (bugs found this way)
@@ -148,6 +163,16 @@ Related issues discovered during testing:
 - **Glob prefix double-escape**: prepending `(?:.*/)?` to a glob *before*
   converting it to a regex escapes the regex metacharacters. Build the raw
   regex first, then prepend the prefix.
+- **Auto-description from `resourceUri`** (VS Code ≥ 1.112): any
+  `QuickPickItem` that sets `resourceUri` but *no* `description` gets one
+  auto-filled by the renderer (`description ??= getUriLabel(uri, {relative:
+  true})`), so the row shows the path twice — once big, once small. Fix:
+  always set `description: ''` on items carrying `resourceUri`. See
+  `vscode-quick-pick-quirks.md`.
+- **Right-only ellipsis**: the widget truncates long labels on the right with
+  CSS `text-overflow`, hiding the filename. Fix: pre-truncate the label in
+  code, keeping the tail (`truncateLeft` in `picker.ts`, 80 chars,
+  segment-aware with a `…/` prefix).
 - **Status bar check**: on the Welcome screen the status bar is not rendered;
   verify copies via the clipboard (`pbpaste`), not the status bar.
 
@@ -160,3 +185,34 @@ Related issues discovered during testing:
   DOM (list rows, input value) and the clipboard.
 - `navigator.clipboard.readText()` is denied in the renderer; read the OS
   clipboard instead.
+
+## 6. Testing on code-server
+
+The same CDP approach works when the extension runs in code-server inside a
+browser tab (e.g. Vivaldi on port 9222):
+
+1. Install the VSIX into code-server's extensions dir, then reload the page:
+
+   ```bash
+   code --extensions-dir ~/.local/share/code-server/extensions \
+        --install-extension vscode-path-picker-0.0.1.vsix --force
+   ```
+
+   `make install` already covers this via `vscode-hacker-meta` (installs for
+   both desktop VS Code and code-server).
+
+2. Connect Playwright/CDP to the browser's debugging port (9222), find the
+   code-server tab, and drive it as usual.
+
+Gotchas specific to code-server:
+
+- After (re)installing the VSIX, the extension host must be restarted: a
+  page reload (or `Developer: Reload Window`) does it; otherwise the old
+  code keeps running even though the files on disk are new.
+- CDP key presses can be swallowed: a focused terminal pane eats keys, and
+  the browser may intercept shortcuts (e.g. `Ctrl+Shift+P` in Vivaldi).
+  Click into the editor first, and open the command palette with `F1` when
+  keybindings misbehave.
+- The list DOM is the same as desktop (`monaco-list-row`, `label-name`); the
+  a11y snapshot may omit the quick input widget, query it with
+  `page.evaluate` instead.
