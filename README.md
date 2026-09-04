@@ -62,7 +62,7 @@ Manual equivalent:
 ```
 npm install
 npm run compile
-npm run package     # produces vscode-path-picker-0.0.1.vsix
+npm run package     # produces vscode-hacker-path-picker-2026.08.14-1.vsix
 ```
 
 Install the VSIX via the Extensions view → `...` → **Install from VSIX...**.

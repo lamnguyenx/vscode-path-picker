@@ -1,9 +1,9 @@
 {
-	"name": "vscode-path-picker",
+	"name": "hacker-path-picker",
 	"displayName": "Path Picker",
 	"description": "Pick a file or folder like the File Picker, then copy its relative path (Enter), real path (Shift+Enter), or reveal it in the Explorer (Cmd+Enter).",
-	"version": "0.0.1",
-	"publisher": "lamnt45",
+	"version": "2026.9.3",
+	"publisher": "lamnguyenx",
 	"license": "MIT",
 	"repository": {
 		"type": "git",

@@ -9,7 +9,7 @@ cd ~/git/vscode-path-picker
 make build                  # npm install + compile + vsce package
 ```
 
-Produces `vscode-path-picker-0.0.1.vsix`.
+Produces `vscode-hacker-path-picker-2026.08.14-1.vsix`.
 
 ## 2. Launch an isolated test instance
 
@@ -31,7 +31,7 @@ printf '{\n  "security.workspace.trust.enabled": false,\n  "window.restoreWindow
 
 # install the VSIX into the isolated extensions dir
 code --extensions-dir /tmp/pcp-ext \
-     --install-extension vscode-path-picker-0.0.1.vsix --force
+     --install-extension vscode-hacker-path-picker-2026.08.14-1.vsix --force
 
 # launch with remote debugging (pick a free port, e.g. 9341)
 code --user-data-dir /tmp/pcp-ud \
@@ -195,7 +195,7 @@ browser tab (e.g. Vivaldi on port 9222):
 
    ```bash
    code --extensions-dir ~/.local/share/code-server/extensions \
-        --install-extension vscode-path-picker-0.0.1.vsix --force
+        --install-extension vscode-hacker-path-picker-2026.08.14-1.vsix --force
    ```
 
    `make install` already covers this via `vscode-hacker-meta` (installs for
