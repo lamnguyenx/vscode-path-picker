@@ -54,7 +54,7 @@ Requires Node.js. Everything below is automated:
 
 ```bash
 make build      # npm install + compile + package (produces *.vsix)
-make install    # build + install the VSIX into VS Code
+make install    # build + install into VS Code and code-server
 ```
 
 Manual equivalent:
