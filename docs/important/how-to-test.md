@@ -1,5 +1,11 @@
 # How to Test Path Picker
 
+> **General rules live in the meta repo** —
+> [`how-to-test-all.md`](../../../../docs/important/how-to-test-all.md). Read it
+> first: it consolidates environment choice, the control-channel-vs-CDP model,
+> determinism, state hygiene, ports/paths, cache-busting, A/B isolation, and
+> flakiness. This document keeps only what is specific to *path picker*.
+
 This extension was validated end-to-end against a **real, running VS Code instance** (not unit mocks). The extension runs in an isolated profile with a fresh `user-data-dir` and its own `extensions-dir`, and is driven over the Chrome DevTools Protocol (CDP) with Playwright. Clipboard results are verified on the OS level with `pbpaste`.
 
 ## 1. Build and package
