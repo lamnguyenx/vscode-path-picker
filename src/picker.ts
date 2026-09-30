@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import { hasGlobChars } from './fuzzy';
 import { IndexEntry, PathIndex } from './index';
 import { realPath, relativeToRoot, rootOf } from './paths';
+import { truncateLeft } from './text';
 
 interface EntryItem extends vscode.QuickPickItem {
 	entry: IndexEntry;
@@ -66,23 +67,6 @@ function refresh(): void {
 	}
 	const query = current.value;
 	current.items = currentIndex.entriesFor(query, hasGlobChars(query)).map(toItem);
-}
-
-const MAX_LABEL_LENGTH = 80;
-
-function truncateLeft(rel: string): string {
-	if (rel.length <= MAX_LABEL_LENGTH) {
-		return rel;
-	}
-	let out = rel;
-	while (out.length > MAX_LABEL_LENGTH) {
-		const slash = out.indexOf('/');
-		if (slash === -1) {
-			return '…' + out.slice(out.length - (MAX_LABEL_LENGTH - 1));
-		}
-		out = out.slice(slash + 1);
-	}
-	return '…/' + out;
 }
 
 function toItem(e: IndexEntry): EntryItem {

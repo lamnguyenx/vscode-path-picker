@@ -49,7 +49,7 @@ the **end** of the string. For paths you usually want to keep the filename
 (the tail) and cut the head.
 
 Fix: pre-truncate the label yourself, segment-aware so names aren't split
-mid-word, and prefix with `…/` (see `truncateLeft` in `picker.ts`).
+mid-word, and prefix with `…/` (see `truncateLeft` in `src/text.ts`).
 
 ## 4. State survives hide/show
 

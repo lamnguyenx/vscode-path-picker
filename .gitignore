@@ -15,6 +15,16 @@ __pycache__/
 # Test/experiment scratch
 exp/
 .vscode-test/
+test-results/
+playwright-report/
+
+# E2E fixtures written at runtime into tests/workspace by
+# tests/playwright/fixture.ts and removed again in afterAll. `build/` is
+# already ignored by the generic rule above.
+tests/workspace/ignored.log
+tests/workspace/scratch.tmp
+tests/workspace/symlink-src
+tests/workspace/long-paths/
 
 # OS
 .DS_Store

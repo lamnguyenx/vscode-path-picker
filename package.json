@@ -106,10 +106,14 @@
 	"scripts": {
 		"compile": "tsc -p ./",
 		"watch": "tsc -w -p ./",
+		"test:units": "bun tests/units/fuzzy_check.ts && bun tests/units/paths_check.ts && bun tests/units/gitignore_check.ts && bun tests/units/text_check.ts",
+		"typecheck:tests": "tsc -p tsconfig.tests.json",
+		"test:e2e": "playwright test --config playwright.config.ts",
 		"vscode:prepublish": "npm run compile",
 		"package": "vsce package"
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.63.0",
 		"@types/node": "^26.0.0",
 		"@types/vscode": "^1.100.0",
 		"@vscode/vsce": "^3.9.2",

@@ -2,9 +2,12 @@
 .vscode/
 exp/**
 src/**
+tests/**
 _refs/**
 docs/**
 Makefile
+playwright.config.ts
 tsconfig.json
+tsconfig.tests.json
 **/*.map
 .git/

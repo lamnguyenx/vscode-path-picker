@@ -65,7 +65,16 @@ npm run compile
 npm run package     # produces vscode-hacker-path-picker-2026.08.14-1.vsix
 ```
 
+### Tests
+
+```bash
+make test-units        # pure-logic checks (fuzzy, paths, gitignore, truncation)
+make typecheck-tests   # strict typecheck of tests/ + configs
+make test-e2e          # Playwright E2E against running code-server (CDP 9024)
+```
+
 Install the VSIX via the Extensions view → `...` → **Install from VSIX...**.
 
 See `docs/important/how-to-test.md` for the end-to-end test procedure
-(isolated VS Code instance driven over CDP).
+(REST Control arranges/acts, CDP asserts the QuickPick UI; run against
+code-server or a dev host).

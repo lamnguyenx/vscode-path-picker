@@ -4,7 +4,9 @@ PUB     := $(shell node -p "require('./package.json').publisher")
 EXT_ID  := $(PUB).$(NAME)-$(VERSION)
 VSIX    := build/$(EXT_ID).vsix
 
-.PHONY: build install install-code install-code-server clean vsix
+CDP_PORT ?= 9024
+
+.PHONY: build install install-code install-code-server clean vsix test-units typecheck-tests test-e2e
 
 build: vsix
 
@@ -24,3 +26,20 @@ vsix:
 
 clean:
 	rm -rf build out
+
+## Pure-logic checks (bun; no dev host, no compile).
+test-units:
+	bun tests/units/fuzzy_check.ts
+	bun tests/units/paths_check.ts
+	bun tests/units/gitignore_check.ts
+	bun tests/units/text_check.ts
+
+## Strict typecheck of the committed test suite.
+typecheck-tests:
+	npx tsc -p tsconfig.tests.json
+
+## Playwright E2E (REST Control arranges/acts; CDP browser asserts).
+## Requires code-server + the CDP browser + REST Control to be running, and the
+## current VSIX installed — see docs/important/how-to-test.md.
+test-e2e:
+	CDP_PORT=$(CDP_PORT) npx playwright test --config playwright.config.ts
