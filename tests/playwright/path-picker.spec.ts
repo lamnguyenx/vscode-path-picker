@@ -31,7 +31,7 @@ import { join } from 'node:path';
  * deterministic (the real meta repo has ~94k files and is capped at 30k).
  *
  * Prereqs: code-server up with this extension installed (`make build` + install,
- * see `docs/important/how-to-test.md`), a CDP browser on 9024, REST Control on
+ * see `docs/important/testing/how-to-test.md`), a CDP browser on 9024, REST Control on
  * 40620, and the runner able to see the extension checkout at the same path the
  * container does (the meta repo mounts `~/git` at the same absolute path).
  */

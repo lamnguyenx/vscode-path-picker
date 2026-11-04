@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-29
 **Status:** implemented & verified (`npm run typecheck:tests`; `npm run test:units` → 4/4; `npm run test:e2e` → `16 passed` ≈ 1.8 m against code-server + CDP 9024).
-**Scope:** `tests/units/*`, `tests/playwright/*`, `tests/workspace/*`, `playwright.config.ts`, `tsconfig.tests.json`, `package.json`, `Makefile`, `.vscodeignore`, `.gitignore`, `src/text.ts`, `src/picker.ts`, `docs/important/how-to-test.md`, `docs/important/vscode-quick-pick-quirks.md`, `README.md`, `AGENTS.md`; meta `docs/important/how-to-test-all.md`.
+**Scope:** `tests/units/*`, `tests/playwright/*`, `tests/workspace/*`, `playwright.config.ts`, `tsconfig.tests.json`, `package.json`, `Makefile`, `.vscodeignore`, `.gitignore`, `src/text.ts`, `src/picker.ts`, `docs/important/testing/how-to-test.md`, `docs/important/testing/vscode-quick-pick-quirks.md`, `README.md`, `AGENTS.md`; meta `docs/important/testing/how-to-test-all.md`.
 
 ---
 
@@ -29,7 +29,7 @@ clean, and a deliberately-failed run still left the tree clean.
 ## 1. Problem
 
 The extension had **no committed tests at all** — no `tests/` directory. Its
-`docs/important/how-to-test.md` described a `full.js` / `edges.js` Playwright
+`docs/important/testing/how-to-test.md` described a `full.js` / `edges.js` Playwright
 suite, and `AGENTS.md` referenced `open_view.cjs` / `test_preview.cjs` /
 `cdp_eval.cjs`, but none of those files existed. The doc was also written for a
 desktop/macOS instance (`pbpaste`, `code --user-data-dir …`) while the live

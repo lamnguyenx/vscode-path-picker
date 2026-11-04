@@ -1,7 +1,7 @@
 # How to Test Path Picker
 
 > **General rules live in the meta repo** —
-> [`how-to-test-all.md`](../../../../docs/important/how-to-test-all.md). Read it
+> [`how-to-test-all.md`](../../../../../docs/important/testing/how-to-test-all.md). Read it
 > first: it consolidates environment choice, the control-channel-vs-CDP model,
 > determinism, state hygiene, ports/paths, cache-busting, A/B isolation, and
 > flakiness. This document keeps only what is specific to *path picker*.
@@ -15,7 +15,7 @@ Path Picker has two committed layers:
 
 The E2E suite arranges/acts through **REST Control** and asserts the
 **QuickPick DOM** and the **status-bar copy echo** over CDP — see
-`docs/important/how-to-test-all.md` §3 ("REST → arrange + act, CDP → assert
+`docs/important/testing/how-to-test-all.md` §3 ("REST → arrange + act, CDP → assert
 only"). There is no webview/iframe: the picker is the workbench's own QuickInput
 widget, rendered in the top-level page.
 

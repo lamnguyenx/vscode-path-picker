@@ -14,7 +14,7 @@
   - `_refs/vscode` : source code of vscode for refrence only
 
 
-See `docs/important/how-to-test.md` for the full pipeline and gotchas.
+See `docs/important/testing/how-to-test.md` for the full pipeline and gotchas.
 
 ### Testing
 

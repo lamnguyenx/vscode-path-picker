@@ -5,7 +5,7 @@
  * executes `vscode.commands.executeCommand` / arbitrary `custom.eval`. It is the
  * deterministic *control channel* for arranging and acting on the workbench —
  * no command-palette automation, no browser-reserved shortcuts. See
- * `docs/important/how-to-test-all.md` §3 in the meta repo.
+ * `docs/important/testing/how-to-test-all.md` §3 in the meta repo.
  *
  * The port is pinned by `HACKER_REST_CONTROL_PORT` (default 40620, set in the
  * meta repo's `docker-compose.yml`).

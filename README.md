@@ -5,48 +5,12 @@ Pick a file **or folder** from the workspace — like VS Code's File Picker (Ctr
 - **Enter** → copy the **relative path** (relative to the workspace root)
 - **Shift+Enter** → copy the **real path** (absolute, symlinks resolved)
 
-## Usage
+## Quick start
 
-Trigger the picker:
-
-| Shortcut | Platform |
-| --- | --- |
-| `Ctrl+Shift+P` | macOS |
-| `Meta+Shift+P` | Windows / Linux |
-
-or via Command Palette: **Path Picker: Pick File or Folder and Copy Path**.
-
-The default keybinding for `pathPicker.pickPath` is defined in
-`package.json` → `contributes.keybindings` (along with the picker-scoped
-`shift+enter` for `pathPicker.copyRealPath`), so it can be changed/rebound from
-**Preferences → Keyboard Shortcuts** like any other command.
-
-Inside the picker:
-
-- Type to fuzzy-search files and folders (subsequence match, e.g. `cmp` → `src/components.ts`).
-- Glob queries work too: `src/*.ts`, `**/test/**`, `docs/{a,b}.md`.
-- Directories are indexed alongside files, so you can copy folder paths too.
-- You can also type an exact path — relative (`src/foo.ts`) or absolute (`/Users/me/foo`) — and press Enter; it is copied if it exists on disk.
-- The copied path is written to the clipboard and confirmed in the status bar.
-
-The `Shift+Enter` keybinding is scoped to the open picker (context key
-`pathPickerPickerVisible`), so it never interferes outside it.
-
-## Settings
-
-| Setting | Default | Description |
-| --- | --- | --- |
-| `pathPicker.exclude` | `["node_modules", ".git", ".hg", ".svn"]` | Directory names skipped while indexing folders. |
-| `pathPicker.maxEntries` | `30000` | Maximum number of files + folders to index. |
-| `pathPicker.followSymlinks` | `false` | Follow symbolic links while indexing. Symlink cycles are detected and skipped. |
-
-Files are discovered via `findFiles` (respects `files.exclude` /
-`search.exclude`); folder traversal honors `pathPicker.exclude`. Both honor
-`.gitignore` files, including nested ones, so ignored files and directories
-don't show up in the picker. Symbolic links are not followed by default;
-set `pathPicker.followSymlinks` to `true` to index symlinked files and
-folders (symlink cycles are skipped). The index rebuilds automatically when
-the workspace changes.
+Press `Ctrl+Shift+P` on macOS or `Meta+Shift+P` on Windows/Linux, or run
+**Path Picker: Pick File or Folder and Copy Path** from the Command Palette.
+Type to fuzzy-search, glob (`src/*.ts`), or enter an exact path, then press
+`Enter` / `Shift+Enter` to copy.
 
 ## Development
 
@@ -75,6 +39,14 @@ make test-e2e          # Playwright E2E against running code-server (CDP 9024)
 
 Install the VSIX via the Extensions view → `...` → **Install from VSIX...**.
 
-See `docs/important/how-to-test.md` for the end-to-end test procedure
-(REST Control arranges/acts, CDP asserts the QuickPick UI; run against
-code-server or a dev host).
+## Docs
+
+### [Usage](docs/important/usage/)
+
+- [Using the picker](docs/important/usage/picker.md): triggers, keybindings, glob/exact-path queries, folders, and the copy confirmation.
+- [Settings](docs/important/usage/settings.md): `pathPicker.exclude`, `maxEntries`, `followSymlinks`, and how indexing respects ignores.
+
+### [Testing](docs/important/testing/)
+
+- [How to test Path Picker](docs/important/testing/how-to-test.md): the end-to-end procedure — REST Control arranges/acts, CDP asserts the QuickPick UI; works against code-server or a dev host.
+- [VS Code QuickPick quirks](docs/important/testing/vscode-quick-pick-quirks.md): built-in `QuickPick` behaviors that surprised us, with the workarounds.
